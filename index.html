@@ -526,6 +526,7 @@
 <script>
 // ── Setup banner ─────────────────────────────────────────────────────────────
 const STORAGE_KEY = "soq_script_url";
+const HARDCODED_URL = "https://script.google.com/macros/s/AKfycbxipvuD66p7xrqJpyfCSGjVDZwLF8uCfIWN_caxcpMGjDlt6grmNsa1T1gqIHikmlar/exec";
 
 (function initBanner() {
   const saved = localStorage.getItem(STORAGE_KEY);
@@ -546,7 +547,7 @@ function saveScriptUrl() {
 }
 
 function getScriptUrl() {
-  return localStorage.getItem(STORAGE_KEY) || "";
+  return HARDCODED_URL || "";
 }
 
 // ── Scoring config ────────────────────────────────────────────────────────────
