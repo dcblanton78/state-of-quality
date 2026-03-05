@@ -16,25 +16,6 @@
   body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.6; min-height: 100vh; }
   body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(0,200,150,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,150,0.03) 1px,transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
 
-  /* ── Setup Banner ── */
-  #setupBanner {
-    position: sticky; top: 0; z-index: 500;
-    background: #1a1200; border-bottom: 2px solid var(--warn);
-    padding: 12px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-  }
-  #setupBanner .banner-label { font-size: 12px; font-weight: 700; color: var(--warn); letter-spacing: .06em; white-space: nowrap; }
-  #setupBanner .banner-input {
-    flex: 1; min-width: 260px; background: #0d1117; border: 1px solid var(--warn);
-    border-radius: 6px; color: var(--text); font-family: 'DM Sans',sans-serif;
-    font-size: 13px; padding: 8px 12px; outline: none;
-  }
-  #setupBanner .banner-btn {
-    background: var(--warn); color: #0d1117; border: none; border-radius: 6px;
-    font-family: 'DM Sans',sans-serif; font-weight: 700; font-size: 13px;
-    padding: 8px 18px; cursor: pointer; white-space: nowrap;
-  }
-  #setupBanner .banner-hint { font-size: 11px; color: var(--muted); width: 100%; }
-
   .page-wrap { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; padding: 40px 20px 80px; }
 
   .header { margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 32px; }
@@ -80,7 +61,7 @@
   .followup.visible { display: block; }
   .followup .q-label { margin-bottom: 10px; color: var(--accent2); }
 
-  .score-panel { position: fixed; top: 70px; right: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; min-width: 170px; text-align: center; z-index: 100; box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+  .score-panel { position: fixed; top: 20px; right: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; min-width: 170px; text-align: center; z-index: 100; box-shadow: 0 8px 32px rgba(0,0,0,.4); }
   .score-panel-title { font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
   .score-number { font-family: 'DM Serif Display',serif; font-size: 36px; color: var(--accent); line-height: 1; margin-bottom: 4px; }
   .score-max { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
@@ -94,10 +75,8 @@
   .submit-btn { background: var(--accent); color: #0d1117; font-family: 'DM Sans',sans-serif; font-weight: 600; font-size: 15px; padding: 14px 40px; border: none; border-radius: 8px; cursor: pointer; transition: opacity .2s, transform .15s; }
   .submit-btn:hover { opacity: .9; transform: translateY(-1px); }
   .submit-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
-
   .sending-msg { font-size: 13px; color: var(--muted); display: none; }
 
-  /* Results overlay */
   .results-overlay { display: none; position: fixed; inset: 0; background: rgba(13,17,23,.95); z-index: 200; overflow-y: auto; padding: 40px 20px; }
   .results-overlay.active { display: flex; align-items: flex-start; justify-content: center; }
   .results-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; max-width: 620px; width: 100%; padding: 40px; }
@@ -114,7 +93,6 @@
 
   .submitted-badge { display: none; background: rgba(0,200,150,.1); border: 1px solid var(--answered-border); border-radius: 10px; padding: 16px 20px; text-align: center; font-size: 14px; color: var(--accent); }
   .submitted-badge.visible { display: block; }
-
   .close-results-btn { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: 'DM Sans',sans-serif; font-size: 14px; padding: 12px; border-radius: 8px; cursor: pointer; margin-top: 16px; transition: border-color .2s; }
   .close-results-btn:hover { border-color: var(--accent); }
 
@@ -123,16 +101,8 @@
 </head>
 <body>
 
-<!-- ── Setup Banner ── -->
-<div id="setupBanner">
-  <span class="banner-label">⚙ ONE-TIME SETUP</span>
-  <input class="banner-input" id="scriptUrlInput" type="text" placeholder="Paste your Google Apps Script Web App URL here…">
-  <button class="banner-btn" onclick="saveScriptUrl()">Save & Activate</button>
-  <span class="banner-hint">Get this URL from Apps Script → Deploy → Web App URL. Only needs to be done once per browser.</span>
-</div>
-
 <!-- Floating Score Panel -->
-<div class="score-panel" id="scorePanel">
+<div class="score-panel">
   <div class="score-panel-title">Quality Score</div>
   <div class="score-number" id="liveScore">0</div>
   <div class="score-max">/ 100</div>
@@ -148,7 +118,7 @@
 
   <div class="progress-wrap">
     <div class="progress-label">
-      <span id="progressLabel">0 of 30 questions answered</span>
+      <span id="progressLabel">0 questions answered</span>
       <span id="progressPct">0%</span>
     </div>
     <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
@@ -156,11 +126,11 @@
 
   <form id="surveyForm">
 
-    <!-- Intro -->
+    <!-- INTRO -->
     <div class="section">
       <div class="section-header"><span class="section-num">INTRO</span><span class="section-title">Team Information</span></div>
       <div class="q-card" id="qc-mgr">
-        <div class="q-label">Your Name & Team</div>
+        <div class="q-label">Your Name &amp; Team</div>
         <input type="text" class="text-input" id="q-mgr" placeholder="e.g. Jane Smith — Provider Tools" style="height:42px;resize:none;" oninput="checkText('q-mgr','qc-mgr')">
       </div>
       <div class="q-card" id="qc-date">
@@ -169,7 +139,7 @@
       </div>
     </div>
 
-    <!-- Section 1 -->
+    <!-- SECTION 01 — Unit Testing -->
     <div class="section">
       <div class="section-header"><span class="section-num">01</span><span class="section-title">Unit Testing</span></div>
       <div class="q-card" id="qc-1">
@@ -202,7 +172,7 @@
       </div>
     </div>
 
-    <!-- Section 2 -->
+    <!-- SECTION 02 — Integration Testing -->
     <div class="section">
       <div class="section-header"><span class="section-num">02</span><span class="section-title">Integration Testing</span></div>
       <div class="q-card" id="qc-4">
@@ -234,14 +204,14 @@
       </div>
     </div>
 
-    <!-- Section 3 -->
+    <!-- SECTION 03 — E2E / Functional Testing -->
     <div class="section">
-      <div class="section-header"><span class="section-num">03</span><span class="section-title">End-to-End & Functional Testing</span></div>
+      <div class="section-header"><span class="section-num">03</span><span class="section-title">End-to-End &amp; Functional Testing</span></div>
       <div class="q-card" id="qc-6">
         <div class="q-label"><span class="q-num">Q6</span>Does your team perform E2E or functional testing before release?</div>
         <div class="options">
           <label class="opt-label"><input type="radio" name="q6" value="3"> Yes — automated</label>
-          <label class="opt-label"><input type="radio" name="q6" value="2"> Yes — both automated & manual</label>
+          <label class="opt-label"><input type="radio" name="q6" value="2"> Yes — both automated &amp; manual</label>
           <label class="opt-label"><input type="radio" name="q6" value="1"> Yes — manual only</label>
           <label class="opt-label"><input type="radio" name="q6" value="0"> No</label>
         </div>
@@ -267,7 +237,7 @@
       </div>
     </div>
 
-    <!-- Section 4 -->
+    <!-- SECTION 04 — CI/CD Pipeline -->
     <div class="section">
       <div class="section-header"><span class="section-num">04</span><span class="section-title">CI/CD Pipeline Quality Gates</span></div>
       <div class="q-card" id="qc-9">
@@ -308,9 +278,9 @@
       </div>
     </div>
 
-    <!-- Section 5 -->
+    <!-- SECTION 05 — Release Validation -->
     <div class="section">
-      <div class="section-header"><span class="section-num">05</span><span class="section-title">Release & Production Validation</span></div>
+      <div class="section-header"><span class="section-num">05</span><span class="section-title">Release &amp; Production Validation</span></div>
       <div class="q-card" id="qc-12">
         <div class="q-label"><span class="q-num">Q12</span>Does your team participate in Thursday night release validation?</div>
         <div class="options">
@@ -338,7 +308,7 @@
         </div>
       </div>
       <div class="q-card" id="qc-15">
-        <div class="q-label"><span class="q-num">Q15</span>Are any post-deploy production validation tests automated?</div>
+        <div class="q-label"><span class="q-num">Q15</span>Are any post-deploy production validation tests automated? (smoke tests, synthetic monitoring, etc.)</div>
         <div class="options">
           <label class="opt-label"><input type="radio" name="q15" value="3"> Yes, automated and alerting</label>
           <label class="opt-label"><input type="radio" name="q15" value="2"> In progress</label>
@@ -348,11 +318,11 @@
       </div>
     </div>
 
-    <!-- Section 7 -->
+    <!-- SECTION 06 — Defect Management -->
     <div class="section">
-      <div class="section-header"><span class="section-num">07</span><span class="section-title">Defect Management</span></div>
+      <div class="section-header"><span class="section-num">06</span><span class="section-title">Defect Management</span></div>
       <div class="q-card" id="qc-19">
-        <div class="q-label"><span class="q-num">Q19</span>Where does your team formally track bugs/defects?</div>
+        <div class="q-label"><span class="q-num">Q16</span>Where does your team formally track bugs/defects?</div>
         <div class="options">
           <label class="opt-label"><input type="radio" name="q19" value="Azure DevOps"> Azure DevOps</label>
           <label class="opt-label"><input type="radio" name="q19" value="Jira"> Jira</label>
@@ -361,7 +331,7 @@
         </div>
       </div>
       <div class="q-card" id="qc-20">
-        <div class="q-label"><span class="q-num">Q20</span>Do you track escaped defects (bugs found in Prod that weren't caught in QA)?</div>
+        <div class="q-label"><span class="q-num">Q17</span>Do you track escaped defects (bugs found in Prod that weren't caught in QA)?</div>
         <div class="options">
           <label class="opt-label"><input type="radio" name="q20" value="3"> Yes, tracked and reviewed</label>
           <label class="opt-label"><input type="radio" name="q20" value="2"> Yes, tracked but not regularly reviewed</label>
@@ -369,7 +339,7 @@
         </div>
       </div>
       <div class="q-card" id="qc-21">
-        <div class="q-label"><span class="q-num">Q21</span>On average, how many escaped defects reach production per month?</div>
+        <div class="q-label"><span class="q-num">Q18</span>On average, how many escaped defects reach production per month?</div>
         <div class="options">
           <label class="opt-label"><input type="radio" name="q21" value="3"> 0</label>
           <label class="opt-label"><input type="radio" name="q21" value="2"> 1–3</label>
@@ -379,11 +349,11 @@
       </div>
     </div>
 
-    <!-- Section 8 -->
+    <!-- SECTION 07 — Tooling & Observability -->
     <div class="section">
-      <div class="section-header"><span class="section-num">08</span><span class="section-title">Tooling & Observability</span></div>
+      <div class="section-header"><span class="section-num">07</span><span class="section-title">Tooling &amp; Observability</span></div>
       <div class="q-card" id="qc-22">
-        <div class="q-label"><span class="q-num">Q22</span>Does your team have production monitoring or alerting in place?</div>
+        <div class="q-label"><span class="q-num">Q19</span>Does your team have production monitoring or alerting in place?</div>
         <div class="options">
           <label class="opt-label"><input type="radio" name="q22" value="3"> Yes, comprehensive with alerting</label>
           <label class="opt-label"><input type="radio" name="q22" value="2"> Partial monitoring</label>
@@ -396,7 +366,7 @@
         </div>
       </div>
       <div class="q-card" id="qc-23">
-        <div class="q-label"><span class="q-num">Q23</span>Do you have synthetic monitoring / synthetic user testing in production?</div>
+        <div class="q-label"><span class="q-num">Q20</span>Do you have synthetic monitoring / synthetic user testing in production?</div>
         <div class="options">
           <label class="opt-label"><input type="radio" name="q23" value="3"> Yes</label>
           <label class="opt-label"><input type="radio" name="q23" value="2"> In progress</label>
@@ -404,16 +374,16 @@
         </div>
       </div>
       <div class="q-card" id="qc-24">
-        <div class="q-label"><span class="q-num">Q24</span>What test automation tools/frameworks does your team use?</div>
+        <div class="q-label"><span class="q-num">Q21</span>What test automation tools/frameworks does your team currently use?</div>
         <input type="text" class="text-input" id="q24-text" placeholder="e.g. Playwright, Selenium, Postman/Newman, Cypress…" style="height:42px;resize:none;" oninput="checkText('q24-text','qc-24')">
       </div>
     </div>
 
-    <!-- Section 9 -->
+    <!-- SECTION 08 — Culture & Confidence -->
     <div class="section">
-      <div class="section-header"><span class="section-num">09</span><span class="section-title">Culture & Confidence</span></div>
+      <div class="section-header"><span class="section-num">08</span><span class="section-title">Culture &amp; Confidence</span></div>
       <div class="q-card" id="qc-25">
-        <div class="q-label"><span class="q-num">Q25</span>How confident are you that your team catches critical bugs <em>before</em> they reach production?</div>
+        <div class="q-label"><span class="q-num">Q22</span>How confident are you that your team catches critical bugs <em>before</em> they reach production?</div>
         <div class="scale-wrap">
           <button type="button" class="scale-btn" onclick="setScale('q25',1,this)">1</button>
           <button type="button" class="scale-btn" onclick="setScale('q25',2,this)">2</button>
@@ -425,7 +395,7 @@
         <input type="hidden" id="q25-val" value="">
       </div>
       <div class="q-card" id="qc-26">
-        <div class="q-label"><span class="q-num">Q26</span>Does your team participate in post-incident reviews (PIRs) after production issues?</div>
+        <div class="q-label"><span class="q-num">Q23</span>Does your team conduct post-incident reviews (PIRs) after production issues?</div>
         <div class="options">
           <label class="opt-label"><input type="radio" name="q26" value="3"> Yes, consistently with action items tracked</label>
           <label class="opt-label"><input type="radio" name="q26" value="2"> Sometimes</label>
@@ -434,7 +404,7 @@
         </div>
       </div>
       <div class="q-card" id="qc-27">
-        <div class="q-label"><span class="q-num">Q27</span>Are quality metrics reviewed regularly with your team?</div>
+        <div class="q-label"><span class="q-num">Q24</span>Are quality metrics reviewed regularly with your team?</div>
         <div class="options">
           <label class="opt-label"><input type="radio" name="q27" value="3"> Yes, in sprint reviews or regular cadence</label>
           <label class="opt-label"><input type="radio" name="q27" value="2"> Occasionally</label>
@@ -442,7 +412,7 @@
         </div>
       </div>
       <div class="q-card" id="qc-28">
-        <div class="q-label"><span class="q-num">Q28</span>Do engineers take ownership of quality, or is it seen as "QA's job"?</div>
+        <div class="q-label"><span class="q-num">Q25</span>Do engineers take ownership of quality, or is it seen as "QA's job"?</div>
         <div class="options">
           <label class="opt-label"><input type="radio" name="q28" value="3"> Strong ownership — quality is everyone's responsibility</label>
           <label class="opt-label"><input type="radio" name="q28" value="2"> Mixed — some engineers care, some don't</label>
@@ -452,23 +422,23 @@
       </div>
     </div>
 
-    <!-- Section 10 -->
+    <!-- SECTION 09 — Open Feedback -->
     <div class="section">
-      <div class="section-header"><span class="section-num">10</span><span class="section-title">Open Feedback</span></div>
+      <div class="section-header"><span class="section-num">09</span><span class="section-title">Open Feedback</span></div>
       <div class="q-card" id="qc-29">
-        <div class="q-label"><span class="q-num">Q29</span>What is the single biggest quality challenge your team faces today?</div>
+        <div class="q-label"><span class="q-num">Q26</span>What is the single biggest quality challenge your team faces today?</div>
         <textarea class="text-input" id="q29-text" placeholder="Be as specific as possible…" oninput="checkText('q29-text','qc-29')"></textarea>
       </div>
       <div class="q-card" id="qc-30">
-        <div class="q-label"><span class="q-num">Q30</span>What would most help your team improve quality in the next 6 months?</div>
+        <div class="q-label"><span class="q-num">Q27</span>What would most help your team improve quality in the next 6 months?</div>
         <textarea class="text-input" id="q30-text" placeholder="Tools, training, headcount, process changes…" oninput="checkText('q30-text','qc-30')"></textarea>
       </div>
     </div>
 
     <div class="submit-area">
-      <button type="button" class="submit-btn" id="submitBtn" onclick="submitSurvey()">Submit & View My Score →</button>
+      <button type="button" class="submit-btn" id="submitBtn" onclick="submitSurvey()">Submit &amp; View My Score →</button>
       <div class="sending-msg" id="sendingMsg">⏳ Submitting your response…</div>
-      <div class="submitted-badge" id="submittedBadge">✅ Response submitted to Google Sheets. Thank you!</div>
+      <div class="submitted-badge" id="submittedBadge">✅ Response submitted. Thank you!</div>
     </div>
 
   </form>
@@ -491,70 +461,59 @@
 </div>
 
 <script>
-// ── Setup banner ─────────────────────────────────────────────────────────────
-const STORAGE_KEY = "soq_script_url";
-const HARDCODED_URL = "https://script.google.com/macros/s/AKfycbxipvuD66p7xrqJpyfCSGjVDZwLF8uCfIWN_caxcpMGjDlt6grmNsa1T1gqIHikmlar/exec";
+// ── Hardcoded Apps Script endpoint — no setup banner needed ───────────────────
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxipvuD66p7xrqJpyfCSGjVDZwLF8uCfIWN_caxcpMGjDlt6grmNsa1T1gqIHikmlar/exec";
 
-(function initBanner() {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (saved) {
-    document.getElementById("setupBanner").style.display = "none";
-    document.getElementById("scriptUrlInput").value = saved;
-  }
-})();
-
-function saveScriptUrl() {
-  const url = document.getElementById("scriptUrlInput").value.trim();
-  if (!url.startsWith("https://script.google.com")) {
-    alert("That doesn't look like a Google Apps Script URL. It should start with https://script.google.com/macros/s/...");
-    return;
-  }
-  localStorage.setItem(STORAGE_KEY, url);
-  document.getElementById("setupBanner").style.display = "none";
-}
-
-function getScriptUrl() {
-  return HARDCODED_URL || "";
-}
-
-// ── Scoring config ────────────────────────────────────────────────────────────
+// ── Scoring config — 8 domains, 59 pts max ────────────────────────────────────
+// Domain              Questions         Max pts
+// unit                q1, q2            6
+// integration         q4, q5            6
+// e2e                 q6, q8            6
+// cicd                q9, q10, q11      9
+// release             q14, q15          6
+// defects             q20, q21          6
+// tooling             q22, q23          6
+// culture             q25, q26, q27, q28  14
+// TOTAL                                 59
 const scoring = {
-  q1:{max:3,field:'unit'}, q2:{max:3,field:'unit'},
+  q1:{max:3,field:'unit'},    q2:{max:3,field:'unit'},
   q4:{max:3,field:'integration'}, q5:{max:3,field:'integration'},
-  q6:{max:3,field:'e2e'}, q8:{max:3,field:'e2e'},
-  q9:{max:3,field:'cicd'}, q10:{max:3,field:'cicd'}, q11:{max:3,field:'cicd'},
+  q6:{max:3,field:'e2e'},     q8:{max:3,field:'e2e'},
+  q9:{max:3,field:'cicd'},    q10:{max:3,field:'cicd'},  q11:{max:3,field:'cicd'},
   q14:{max:3,field:'release'}, q15:{max:3,field:'release'},
-  q16:{max:3,field:'planning'}, q18:{max:3,field:'planning'},
   q20:{max:3,field:'defects'}, q21:{max:3,field:'defects'},
   q22:{max:3,field:'tooling'}, q23:{max:3,field:'tooling'},
   q25:{max:5,field:'culture'}, q26:{max:3,field:'culture'},
   q27:{max:3,field:'culture'}, q28:{max:3,field:'culture'},
 };
-const domainMax   = {unit:6,integration:6,e2e:6,cicd:9,release:6,planning:6,defects:6,tooling:6,culture:14};
-const domainLabel = {unit:'Unit Testing',integration:'Integration Testing',e2e:'E2E/Functional',cicd:'CI/CD Pipeline',release:'Release Validation',planning:'Test Planning',defects:'Defect Management',tooling:'Tooling/Observability',culture:'Quality Culture'};
+const SCORE_MAX = 59;
+const domainMax   = {unit:6,integration:6,e2e:6,cicd:9,release:6,defects:6,tooling:6,culture:14};
+const domainLabel = {unit:'Unit Testing',integration:'Integration Testing',e2e:'E2E / Functional',cicd:'CI/CD Pipeline',release:'Release Validation',defects:'Defect Management',tooling:'Tooling / Observability',culture:'Quality Culture'};
 const scaleAnswers = {};
 
-// ── Event wiring ─────────────────────────────────────────────────────────────
+// ── Event wiring ──────────────────────────────────────────────────────────────
 document.querySelectorAll('input[type=radio]').forEach(r => {
   r.addEventListener('change', () => {
-    updateCard(r.name);
+    styleRadioGroup(r.name);
     handleConditional(r.name, r.value);
     recalcScore();
     updateProgress();
   });
 });
 document.querySelectorAll('input[type=checkbox]').forEach(c => {
-  c.addEventListener('change', () => {
-    c.closest('.opt-label').classList.toggle('selected', c.checked);
-  });
+  c.addEventListener('change', () => c.closest('.opt-label').classList.toggle('selected', c.checked));
 });
 
-function updateCard(name) {
+function styleRadioGroup(name) {
   document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
     r.closest('.opt-label')?.classList.toggle('selected', r.checked);
   });
-  const num = name.replace('q','');
-  document.getElementById('qc-' + num)?.classList.add('answered');
+  // Mark the parent card answered — find card by scanning parent chain
+  const checked = document.querySelector(`input[name="${name}"]:checked`);
+  if (checked) {
+    const card = checked.closest('.q-card');
+    if (card) card.classList.add('answered');
+  }
 }
 
 function handleConditional(name, val) {
@@ -574,143 +533,131 @@ function setScale(qid, val, btn) {
 }
 
 function checkText(inputId, cardId) {
-  const val = document.getElementById(inputId).value.trim();
-  document.getElementById(cardId)?.classList.toggle('answered', val.length > 0);
+  const val = document.getElementById(inputId)?.value.trim();
+  document.getElementById(cardId)?.classList.toggle('answered', val?.length > 0);
   updateProgress();
 }
 
 function getRadio(name) {
-  const c = document.querySelector(`input[name="${name}"]:checked`);
-  return c ? c.value : null;
+  return document.querySelector(`input[name="${name}"]:checked`)?.value ?? null;
 }
-
 function getCheckboxes(name) {
   return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(c => c.value).join(', ');
 }
 
+// ── Score calculation ─────────────────────────────────────────────────────────
 function recalcScore() {
-  const domainScores = {};
-  Object.keys(domainMax).forEach(d => domainScores[d] = 0);
-  let total = 0, maxTotal = 0;
+  const domainScores = Object.fromEntries(Object.keys(domainMax).map(d => [d, 0]));
+  let total = 0;
+
   for (const [qid, cfg] of Object.entries(scoring)) {
-    maxTotal += cfg.max;
-    let val = qid === 'q25' ? (scaleAnswers['q25'] || 0) : (parseFloat(getRadio(qid)) || 0);
-    const pts = Math.min(val, cfg.max);
+    const raw = qid === 'q25' ? (scaleAnswers['q25'] || 0) : (parseFloat(getRadio(qid)) || 0);
+    const pts = Math.min(raw, cfg.max);
     total += pts;
     domainScores[cfg.field] += pts;
   }
-  const norm = Math.round((total / maxTotal) * 100);
+
+  const norm = Math.round((total / SCORE_MAX) * 100);
   document.getElementById('liveScore').textContent = norm;
   const tier = getTier(norm);
   const tierEl = document.getElementById('liveTier');
   tierEl.textContent = tier.label;
   tierEl.className = 'score-tier ' + tier.cls;
-  window._lastScore = {norm, domainScores, raw: total};
-  return {norm, domainScores, raw: total};
+
+  window._lastScore = { norm, domainScores, raw: total };
+  return { norm, domainScores, raw: total };
 }
 
 function getTier(s) {
-  if (s >= 80) return {label:'🟢 Optimizing', cls:'tier-4'};
-  if (s >= 60) return {label:'🔵 Maturing',   cls:'tier-3'};
-  if (s >= 35) return {label:'🟡 Developing',  cls:'tier-2'};
-  return              {label:'🔴 Initial',     cls:'tier-1'};
+  if (s >= 80) return { label:'🟢 Optimizing', cls:'tier-4' };
+  if (s >= 60) return { label:'🔵 Maturing',   cls:'tier-3' };
+  if (s >= 35) return { label:'🟡 Developing',  cls:'tier-2' };
+  return              { label:'🔴 Initial',     cls:'tier-1' };
 }
 
 function updateProgress() {
   const count = document.querySelectorAll('.q-card.answered').length;
   const total = document.querySelectorAll('.q-card[id^="qc-"]').length;
-  const pct = Math.round((count / total) * 100);
+  const pct   = Math.round((count / total) * 100);
   document.getElementById('progressLabel').textContent = `${count} of ${total} questions answered`;
-  document.getElementById('progressPct').textContent = pct + '%';
-  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent   = pct + '%';
+  document.getElementById('progressFill').style.width  = pct + '%';
 }
 
-// ── Build payload ─────────────────────────────────────────────────────────────
+// ── Payload ───────────────────────────────────────────────────────────────────
 function buildPayload(score) {
   return {
-    manager:    document.getElementById('q-mgr').value.trim(),
-    date:       document.getElementById('q-date').value,
-    q1:         getRadio('q1'),
-    q1_cov:     document.getElementById('q1-cov').value,
-    q1_actual:  document.getElementById('q1-actual').value,
-    q2:         getRadio('q2'),
-    q3:         document.getElementById('q3-text').value.trim(),
-    q4:         getRadio('q4'),
-    q4_layers:  getCheckboxes('q4-layers'),
-    q5:         getRadio('q5'),
-    q6:         getRadio('q6'),
-    q7:         getRadio('q7'),
-    q8:         getRadio('q8'),
-    q9:         getRadio('q9'),
-    q9_env:     getCheckboxes('q9-env'),
-    q10:        getRadio('q10'),
-    q11:        getRadio('q11'),
-    q12:        getRadio('q12'),
-    q13:        getRadio('q13'),
-    q14:        getRadio('q14'),
-    q15:        getRadio('q15'),
-    q16:        getRadio('q16'),
-    q17:        getRadio('q17'),
-    q18:        getRadio('q18'),
-    q19:        getRadio('q19'),
-    q20:        getRadio('q20'),
-    q21:        getRadio('q21'),
-    q22:        getRadio('q22'),
-    q22_tools:  document.getElementById('q22-tools').value.trim(),
-    q23:        getRadio('q23'),
-    q24:        document.getElementById('q24-text').value.trim(),
-    q25:        scaleAnswers['q25'] || '',
-    q26:        getRadio('q26'),
-    q27:        getRadio('q27'),
-    q28:        getRadio('q28'),
-    q29:        document.getElementById('q29-text').value.trim(),
-    q30:        document.getElementById('q30-text').value.trim(),
-    raw_score:  score.raw,
-    score_100:  score.norm,
-    tier:       getTier(score.norm).label,
+    manager:   document.getElementById('q-mgr').value.trim(),
+    date:      document.getElementById('q-date').value,
+    q1:        getRadio('q1'),
+    q1_cov:    document.getElementById('q1-cov').value,
+    q1_actual: document.getElementById('q1-actual').value,
+    q2:        getRadio('q2'),
+    q3:        document.getElementById('q3-text').value.trim(),
+    q4:        getRadio('q4'),
+    q4_layers: getCheckboxes('q4-layers'),
+    q5:        getRadio('q5'),
+    q6:        getRadio('q6'),
+    q7:        getRadio('q7'),
+    q8:        getRadio('q8'),
+    q9:        getRadio('q9'),
+    q9_env:    getCheckboxes('q9-env'),
+    q10:       getRadio('q10'),
+    q11:       getRadio('q11'),
+    q12:       getRadio('q12'),
+    q13:       getRadio('q13'),
+    q14:       getRadio('q14'),
+    q15:       getRadio('q15'),
+    q19:       getRadio('q19'),
+    q20:       getRadio('q20'),
+    q21:       getRadio('q21'),
+    q22:       getRadio('q22'),
+    q22_tools: document.getElementById('q22-tools').value.trim(),
+    q23:       getRadio('q23'),
+    q24:       document.getElementById('q24-text').value.trim(),
+    q25:       scaleAnswers['q25'] || '',
+    q26:       getRadio('q26'),
+    q27:       getRadio('q27'),
+    q28:       getRadio('q28'),
+    q29:       document.getElementById('q29-text').value.trim(),
+    q30:       document.getElementById('q30-text').value.trim(),
+    raw_score: score.raw,
+    score_100: score.norm,
+    tier:      getTier(score.norm).label,
   };
 }
 
 // ── Submit ────────────────────────────────────────────────────────────────────
 async function submitSurvey() {
   const score = recalcScore();
-  showResults(score);   // Show results immediately — don't make them wait
+  showResults(score);  // show results immediately
 
-  const url = getScriptUrl();
-  const btn = document.getElementById('submitBtn');
-  const sendingMsg = document.getElementById('sendingMsg');
-  const submittedBadge = document.getElementById('submittedBadge');
+  const btn          = document.getElementById('submitBtn');
+  const sendingMsg   = document.getElementById('sendingMsg');
+  const badge        = document.getElementById('submittedBadge');
 
   btn.disabled = true;
   sendingMsg.style.display = 'block';
 
-  if (!url) {
-    sendingMsg.style.display = 'none';
-    submittedBadge.textContent = "⚠ No Google Sheets URL configured — results shown locally only. See setup banner.";
-    submittedBadge.classList.add('visible');
-    return;
-  }
-
   try {
-    const payload = buildPayload(score);
-    // Use no-cors mode since Apps Script doesn't return CORS headers on redirect
-    await fetch(url, {
-      method: 'POST',
-      mode: 'no-cors',
+    await fetch(SCRIPT_URL, {
+      method:  'POST',
+      mode:    'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body:    JSON.stringify(buildPayload(score)),
     });
     sendingMsg.style.display = 'none';
-    submittedBadge.textContent = "✅ Response submitted to Google Sheets. Thank you!";
-    submittedBadge.classList.add('visible');
+    badge.textContent = '✅ Response submitted to Google Sheets. Thank you!';
+    badge.classList.add('visible');
   } catch (err) {
     sendingMsg.style.display = 'none';
-    submittedBadge.textContent = "⚠ Submission failed — check your URL or network. Your score is shown below.";
-    submittedBadge.classList.add('visible');
+    badge.textContent = '⚠ Submission failed — check your network. Score shown locally.';
+    badge.classList.add('visible');
     console.error(err);
   }
 }
 
+// ── Results panel ─────────────────────────────────────────────────────────────
 function showResults(score) {
   document.getElementById('resultsScore').textContent = score.norm;
   const tier = getTier(score.norm);
@@ -730,18 +677,19 @@ function showResults(score) {
   });
 
   const recs = {
-    unit:"Establish unit testing standards and a coverage target (suggest 70%+). Build this habit via a quality boot camp.",
-    integration:"Define integration test coverage for service boundaries. Start with API contract and database layers.",
-    e2e:"Identify your top 10–20 critical user journeys and automate them. Assign ownership to a QE team member.",
-    cicd:"Add automated tests as a pipeline gate on PR merge and deploy to QA. Start with smoke tests if nothing exists.",
-    release:"Formalize Thursday night release validation with a documented runbook. Automate post-deploy smoke checks.",
-    planning:"Add test plan requirements to your Definition of Done. Pilot 3 Amigos sessions for the next sprint.",
-    defects:"Start tracking escaped defects in Azure DevOps. Set a monthly review cadence to identify patterns.",
-    tooling:"Evaluate Datadog or Azure Monitor for alerting. Synthetic monitoring should be a near-term priority.",
-    culture:"Build quality ownership through code review expectations and pair-testing sessions with QE."
+    unit:        'Establish unit testing standards and a coverage target (suggest 70%+). Run a quality boot camp to build the habit.',
+    integration: 'Define integration test coverage for service boundaries. Start with API contract and database layers.',
+    e2e:         'Identify your top 10–20 critical user journeys and automate them. Assign clear ownership to a QE team member.',
+    cicd:        'Add automated tests as a pipeline gate on PR merge and deploy to QA. Start with smoke tests if nothing exists.',
+    release:     'Formalize Thursday night release validation with a documented runbook. Begin automating post-deploy smoke checks.',
+    defects:     'Start tracking escaped defects in Azure DevOps. Set a monthly review cadence to identify patterns.',
+    tooling:     'Evaluate Datadog or Azure Monitor for alerting. Synthetic monitoring should be a near-term priority.',
+    culture:     'Build quality ownership through code review expectations and pair-testing sessions with QE.',
   };
-  const sorted = Object.entries(score.domainScores).sort((a,b) => (a[1]/domainMax[a[0]]) - (b[1]/domainMax[b[0]]));
-  document.getElementById('resultsRecs').innerHTML = sorted.slice(0,3).map(([d]) => `<div class="rec-item">${recs[d]}</div>`).join('');
+  const sorted = Object.entries(score.domainScores)
+    .sort((a, b) => (a[1] / domainMax[a[0]]) - (b[1] / domainMax[b[0]]));
+  document.getElementById('resultsRecs').innerHTML =
+    sorted.slice(0, 3).map(([d]) => `<div class="rec-item">${recs[d]}</div>`).join('');
 
   document.getElementById('resultsOverlay').classList.add('active');
 }
@@ -751,7 +699,7 @@ function getTierDesc(tier) {
     '🔴 Initial':    'Testing practices are largely informal or absent. Immediate action needed on unit testing, CI gating, and defect tracking.',
     '🟡 Developing': 'Some practices in place but inconsistently applied. Focus on standardizing and closing the biggest gaps.',
     '🔵 Maturing':   'Solid foundation with good coverage in several areas. Shift energy toward automation and shift-left practices.',
-    '🟢 Optimizing': 'Strong quality discipline across the board. Focus on continuous improvement and sharing learnings with other teams.'
+    '🟢 Optimizing': 'Strong quality discipline across the board. Focus on continuous improvement and sharing learnings with other teams.',
   }[tier] || '';
 }
 </script>
