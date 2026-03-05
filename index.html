@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>State of Quality — Engineering Manager Survey</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --surface2: #1c2230;
+    --border: #2a3441; --accent: #00c896; --accent2: #0ea5e9;
+    --warn: #f59e0b; --text: #e8edf3; --muted: #7a8799;
+    --answered: #00c89618; --answered-border: #00c89640;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.6; min-height: 100vh; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(0,200,150,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,150,0.03) 1px,transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+
+  /* ── Setup Banner ── */
+  #setupBanner {
+    position: sticky; top: 0; z-index: 500;
+    background: #1a1200; border-bottom: 2px solid var(--warn);
+    padding: 12px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  #setupBanner .banner-label { font-size: 12px; font-weight: 700; color: var(--warn); letter-spacing: .06em; white-space: nowrap; }
+  #setupBanner .banner-input {
+    flex: 1; min-width: 260px; background: #0d1117; border: 1px solid var(--warn);
+    border-radius: 6px; color: var(--text); font-family: 'DM Sans',sans-serif;
+    font-size: 13px; padding: 8px 12px; outline: none;
+  }
+  #setupBanner .banner-btn {
+    background: var(--warn); color: #0d1117; border: none; border-radius: 6px;
+    font-family: 'DM Sans',sans-serif; font-weight: 700; font-size: 13px;
+    padding: 8px 18px; cursor: pointer; white-space: nowrap;
+  }
+  #setupBanner .banner-hint { font-size: 11px; color: var(--muted); width: 100%; }
+
+  .page-wrap { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; padding: 40px 20px 80px; }
+
+  .header { margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 32px; }
+  .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  h1 { font-family: 'DM Serif Display', serif; font-size: clamp(26px,5vw,40px); line-height: 1.15; margin-bottom: 14px; }
+  h1 em { font-style: italic; color: var(--accent); }
+  .header-meta { font-size: 13.5px; color: var(--muted); max-width: 560px; line-height: 1.7; }
+
+  .progress-wrap { margin-bottom: 36px; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .progress-track { height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg,var(--accent),var(--accent2)); border-radius: 99px; transition: width .4s; width: 0%; }
+
+  .section { margin-bottom: 36px; }
+  .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding: 14px 18px; background: var(--surface); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; }
+  .section-num { font-size: 11px; font-weight: 700; letter-spacing: .1em; color: var(--accent); background: rgba(0,200,150,.1); border-radius: 4px; padding: 2px 8px; white-space: nowrap; }
+  .section-title { font-family: 'DM Serif Display', serif; font-size: 18px; }
+
+  .q-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px; margin-bottom: 12px; transition: border-color .2s, background .2s; }
+  .q-card.answered { background: var(--answered); border-color: var(--answered-border); }
+  .q-label { font-size: 14.5px; font-weight: 500; margin-bottom: 14px; display: flex; gap: 10px; }
+  .q-num { font-size: 11px; font-weight: 700; color: var(--accent); background: rgba(0,200,150,.1); border-radius: 4px; padding: 1px 7px; height: fit-content; margin-top: 2px; white-space: nowrap; }
+
+  .options { display: flex; flex-wrap: wrap; gap: 8px; }
+  .options.column { flex-direction: column; }
+  .opt-label { display: flex; align-items: center; gap: 9px; cursor: pointer; padding: 8px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; font-size: 13.5px; color: var(--muted); transition: all .15s; user-select: none; }
+  .opt-label:hover { border-color: var(--accent); color: var(--text); }
+  .opt-label input { width: 14px; height: 14px; accent-color: var(--accent); cursor: pointer; }
+  .opt-label.selected { border-color: var(--accent); background: rgba(0,200,150,.1); color: var(--text); }
+
+  .scale-wrap { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .scale-btn { width: 42px; height: 42px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); font-size: 15px; font-weight: 600; cursor: pointer; transition: all .15s; display: flex; align-items: center; justify-content: center; font-family: 'DM Sans',sans-serif; }
+  .scale-btn:hover { border-color: var(--accent); color: var(--text); }
+  .scale-btn.selected { background: var(--accent); border-color: var(--accent); color: #0d1117; }
+  .scale-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 6px; width: 100%; max-width: 250px; }
+
+  .text-input, .number-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: 'DM Sans',sans-serif; font-size: 14px; padding: 10px 14px; resize: vertical; outline: none; transition: border-color .2s; }
+  .text-input:focus, .number-input:focus { border-color: var(--accent); }
+  textarea.text-input { min-height: 80px; }
+  .number-input { width: 120px; }
+
+  .followup { margin-top: 14px; padding: 14px 16px; background: rgba(14,165,233,.06); border: 1px solid rgba(14,165,233,.2); border-radius: 8px; display: none; }
+  .followup.visible { display: block; }
+  .followup .q-label { margin-bottom: 10px; color: var(--accent2); }
+
+  .score-panel { position: fixed; top: 70px; right: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; min-width: 170px; text-align: center; z-index: 100; box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+  .score-panel-title { font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .score-number { font-family: 'DM Serif Display',serif; font-size: 36px; color: var(--accent); line-height: 1; margin-bottom: 4px; }
+  .score-max { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .score-tier { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 99px; letter-spacing: .05em; }
+  .tier-1 { background: rgba(239,68,68,.15); color: #ef4444; }
+  .tier-2 { background: rgba(245,158,11,.15); color: #f59e0b; }
+  .tier-3 { background: rgba(14,165,233,.15); color: #0ea5e9; }
+  .tier-4 { background: rgba(0,200,150,.15); color: #00c896; }
+
+  .submit-area { margin-top: 40px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .submit-btn { background: var(--accent); color: #0d1117; font-family: 'DM Sans',sans-serif; font-weight: 600; font-size: 15px; padding: 14px 40px; border: none; border-radius: 8px; cursor: pointer; transition: opacity .2s, transform .15s; }
+  .submit-btn:hover { opacity: .9; transform: translateY(-1px); }
+  .submit-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+  .sending-msg { font-size: 13px; color: var(--muted); display: none; }
+
+  /* Results overlay */
+  .results-overlay { display: none; position: fixed; inset: 0; background: rgba(13,17,23,.95); z-index: 200; overflow-y: auto; padding: 40px 20px; }
+  .results-overlay.active { display: flex; align-items: flex-start; justify-content: center; }
+  .results-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; max-width: 620px; width: 100%; padding: 40px; }
+  .results-score-big { font-family: 'DM Serif Display',serif; font-size: 72px; color: var(--accent); line-height: 1; text-align: center; margin-bottom: 6px; }
+  .results-tier-badge { text-align: center; margin-bottom: 24px; }
+  .results-breakdown { display: grid; gap: 10px; margin-bottom: 28px; }
+  .breakdown-row { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; padding: 10px 14px; background: var(--surface2); border-radius: 6px; font-size: 13px; }
+  .breakdown-bar-wrap { width: 80px; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .breakdown-bar { height: 100%; background: var(--accent); border-radius: 99px; }
+  .breakdown-pts { font-weight: 600; font-size: 13px; color: var(--accent); white-space: nowrap; }
+  .results-recs h3 { font-family: 'DM Serif Display',serif; font-size: 18px; margin-bottom: 12px; }
+  .rec-item { font-size: 13.5px; color: var(--muted); padding: 8px 0; border-bottom: 1px solid var(--border); display: flex; gap: 10px; }
+  .rec-item::before { content: '→'; color: var(--warn); font-weight: 700; }
+
+  .submitted-badge { display: none; background: rgba(0,200,150,.1); border: 1px solid var(--answered-border); border-radius: 10px; padding: 16px 20px; text-align: center; font-size: 14px; color: var(--accent); }
+  .submitted-badge.visible { display: block; }
+
+  .close-results-btn { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: 'DM Sans',sans-serif; font-size: 14px; padding: 12px; border-radius: 8px; cursor: pointer; margin-top: 16px; transition: border-color .2s; }
+  .close-results-btn:hover { border-color: var(--accent); }
+
+  @media (max-width: 700px) { .score-panel { display: none; } }
+</style>
+</head>
+<body>
+
+<!-- ── Setup Banner ── -->
+<div id="setupBanner">
+  <span class="banner-label">⚙ ONE-TIME SETUP</span>
+  <input class="banner-input" id="scriptUrlInput" type="text" placeholder="Paste your Google Apps Script Web App URL here…">
+  <button class="banner-btn" onclick="saveScriptUrl()">Save & Activate</button>
+  <span class="banner-hint">Get this URL from Apps Script → Deploy → Web App URL. Only needs to be done once per browser.</span>
+</div>
+
+<!-- Floating Score Panel -->
+<div class="score-panel" id="scorePanel">
+  <div class="score-panel-title">Quality Score</div>
+  <div class="score-number" id="liveScore">0</div>
+  <div class="score-max">/ 100</div>
+  <div class="score-tier tier-1" id="liveTier">Not Started</div>
+</div>
+
+<div class="page-wrap">
+  <div class="header">
+    <div class="eyebrow">Engineering Manager Assessment</div>
+    <h1>State of <em>Quality</em> Survey</h1>
+    <div class="header-meta">This survey establishes a quality baseline across all engineering teams. Responses are used to identify gaps, prioritize QA investment, and measure improvement over time. Be candid — this is a snapshot, not a scorecard against you.</div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span id="progressLabel">0 of 30 questions answered</span>
+      <span id="progressPct">0%</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <form id="surveyForm">
+
+    <!-- Intro -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">INTRO</span><span class="section-title">Team Information</span></div>
+      <div class="q-card" id="qc-mgr">
+        <div class="q-label">Your Name & Team</div>
+        <input type="text" class="text-input" id="q-mgr" placeholder="e.g. Jane Smith — Provider Tools" style="height:42px;resize:none;" oninput="checkText('q-mgr','qc-mgr')">
+      </div>
+      <div class="q-card" id="qc-date">
+        <div class="q-label">Survey Date</div>
+        <input type="date" class="text-input" id="q-date" style="height:42px;resize:none;width:200px;" oninput="checkText('q-date','qc-date')">
+      </div>
+    </div>
+
+    <!-- Section 1 -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">01</span><span class="section-title">Unit Testing</span></div>
+      <div class="q-card" id="qc-1">
+        <div class="q-label"><span class="q-num">Q1</span>Do your engineers write unit tests as part of their development workflow?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q1" value="3"> Yes, consistently</label>
+          <label class="opt-label"><input type="radio" name="q1" value="2"> Yes, sometimes</label>
+          <label class="opt-label"><input type="radio" name="q1" value="1"> Rarely</label>
+          <label class="opt-label"><input type="radio" name="q1" value="0"> No</label>
+        </div>
+        <div class="followup" id="fu-1">
+          <div class="q-label">Target coverage %</div>
+          <input type="number" class="number-input" id="q1-cov" placeholder="e.g. 80" min="0" max="100"> %
+          &nbsp;&nbsp;&nbsp;<span style="color:var(--muted);font-size:13px;">Actual (if measured):</span>
+          <input type="number" class="number-input" id="q1-actual" placeholder="e.g. 42" min="0" max="100" style="margin-left:8px;"> %
+        </div>
+      </div>
+      <div class="q-card" id="qc-2">
+        <div class="q-label"><span class="q-num">Q2</span>Is unit test coverage enforced (e.g., pipeline gate, PR requirement)?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q2" value="3"> Yes, hard gate — blocks merge/deploy</label>
+          <label class="opt-label"><input type="radio" name="q2" value="2"> Yes, but can be overridden</label>
+          <label class="opt-label"><input type="radio" name="q2" value="1"> Informal expectation only</label>
+          <label class="opt-label"><input type="radio" name="q2" value="0"> Not enforced</label>
+        </div>
+      </div>
+      <div class="q-card" id="qc-3">
+        <div class="q-label"><span class="q-num">Q3</span>What framework(s) does your team use for unit testing?</div>
+        <input type="text" class="text-input" id="q3-text" placeholder="e.g. xUnit, NUnit, Jest, Pytest, MSTest…" style="height:42px;resize:none;" oninput="checkText('q3-text','qc-3')">
+      </div>
+    </div>
+
+    <!-- Section 2 -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">02</span><span class="section-title">Integration Testing</span></div>
+      <div class="q-card" id="qc-4">
+        <div class="q-label"><span class="q-num">Q4</span>Does your team write integration tests?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q4" value="3"> Yes, consistently</label>
+          <label class="opt-label"><input type="radio" name="q4" value="2"> Yes, sometimes</label>
+          <label class="opt-label"><input type="radio" name="q4" value="1"> Rarely</label>
+          <label class="opt-label"><input type="radio" name="q4" value="0"> No</label>
+        </div>
+        <div class="followup" id="fu-4">
+          <div class="q-label">What layers are covered? (select all that apply)</div>
+          <div class="options column">
+            <label class="opt-label"><input type="checkbox" name="q4-layers" value="service"> Service-to-service</label>
+            <label class="opt-label"><input type="checkbox" name="q4-layers" value="db"> Database</label>
+            <label class="opt-label"><input type="checkbox" name="q4-layers" value="api"> API contract</label>
+            <label class="opt-label"><input type="checkbox" name="q4-layers" value="ext"> External/3rd-party dependencies</label>
+          </div>
+        </div>
+      </div>
+      <div class="q-card" id="qc-5">
+        <div class="q-label"><span class="q-num">Q5</span>Are integration tests automated and part of the CI pipeline?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q5" value="3"> Yes, fully automated in pipeline</label>
+          <label class="opt-label"><input type="radio" name="q5" value="2"> Partial — some automated, some manual</label>
+          <label class="opt-label"><input type="radio" name="q5" value="1"> Manual only</label>
+          <label class="opt-label"><input type="radio" name="q5" value="0"> No</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3 -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">03</span><span class="section-title">End-to-End & Functional Testing</span></div>
+      <div class="q-card" id="qc-6">
+        <div class="q-label"><span class="q-num">Q6</span>Does your team perform E2E or functional testing before release?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q6" value="3"> Yes — automated</label>
+          <label class="opt-label"><input type="radio" name="q6" value="2"> Yes — both automated & manual</label>
+          <label class="opt-label"><input type="radio" name="q6" value="1"> Yes — manual only</label>
+          <label class="opt-label"><input type="radio" name="q6" value="0"> No</label>
+        </div>
+      </div>
+      <div class="q-card" id="qc-7">
+        <div class="q-label"><span class="q-num">Q7</span>Who owns functional/regression testing for your team?</div>
+        <div class="options column">
+          <label class="opt-label"><input type="radio" name="q7" value="Dev engineers"> Dev engineers</label>
+          <label class="opt-label"><input type="radio" name="q7" value="Embedded QA"> Embedded QA</label>
+          <label class="opt-label"><input type="radio" name="q7" value="Enterprise QA"> Enterprise QA</label>
+          <label class="opt-label"><input type="radio" name="q7" value="Product Manager"> Product Manager</label>
+          <label class="opt-label"><input type="radio" name="q7" value="No clear owner"> No one clearly owns it</label>
+        </div>
+      </div>
+      <div class="q-card" id="qc-8">
+        <div class="q-label"><span class="q-num">Q8</span>Do you have a documented regression suite for your application(s)?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q8" value="3"> Yes, maintained and current</label>
+          <label class="opt-label"><input type="radio" name="q8" value="2"> In progress</label>
+          <label class="opt-label"><input type="radio" name="q8" value="1"> Exists but outdated</label>
+          <label class="opt-label"><input type="radio" name="q8" value="0"> No</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4 -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">04</span><span class="section-title">CI/CD Pipeline Quality Gates</span></div>
+      <div class="q-card" id="qc-9">
+        <div class="q-label"><span class="q-num">Q9</span>Do you have automated tests running in your CI/CD pipeline?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q9" value="3"> Yes, comprehensive</label>
+          <label class="opt-label"><input type="radio" name="q9" value="2"> Yes, partial</label>
+          <label class="opt-label"><input type="radio" name="q9" value="1"> Minimal (smoke only)</label>
+          <label class="opt-label"><input type="radio" name="q9" value="0"> No</label>
+        </div>
+        <div class="followup" id="fu-9">
+          <div class="q-label">On which environment triggers? (select all that apply)</div>
+          <div class="options">
+            <label class="opt-label"><input type="checkbox" name="q9-env" value="PR/Pre-merge"> PR / Pre-merge</label>
+            <label class="opt-label"><input type="checkbox" name="q9-env" value="Dev"> Deploy to Dev</label>
+            <label class="opt-label"><input type="checkbox" name="q9-env" value="QA"> Deploy to QA</label>
+            <label class="opt-label"><input type="checkbox" name="q9-env" value="Prod"> Deploy to Prod</label>
+          </div>
+        </div>
+      </div>
+      <div class="q-card" id="qc-10">
+        <div class="q-label"><span class="q-num">Q10</span>If tests fail in the pipeline, does it block deployment?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q10" value="3"> Yes, hard block</label>
+          <label class="opt-label"><input type="radio" name="q10" value="2"> Yes, but can be overridden</label>
+          <label class="opt-label"><input type="radio" name="q10" value="1"> No block — just a warning</label>
+          <label class="opt-label"><input type="radio" name="q10" value="0"> N/A — no pipeline tests</label>
+        </div>
+      </div>
+      <div class="q-card" id="qc-11">
+        <div class="q-label"><span class="q-num">Q11</span>What is the approximate day-to-day pipeline test pass rate?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q11" value="3"> &gt;95%</label>
+          <label class="opt-label"><input type="radio" name="q11" value="2"> 80–95%</label>
+          <label class="opt-label"><input type="radio" name="q11" value="1"> 50–80%</label>
+          <label class="opt-label"><input type="radio" name="q11" value="0"> &lt;50% or Unknown</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 5 -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">05</span><span class="section-title">Release & Production Validation</span></div>
+      <div class="q-card" id="qc-12">
+        <div class="q-label"><span class="q-num">Q12</span>Does your team participate in Thursday night release validation?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q12" value="Yes"> Yes</label>
+          <label class="opt-label"><input type="radio" name="q12" value="No"> No</label>
+          <label class="opt-label"><input type="radio" name="q12" value="Sometimes"> Sometimes</label>
+        </div>
+      </div>
+      <div class="q-card" id="qc-13">
+        <div class="q-label"><span class="q-num">Q13</span>Who performs production validation testing on release nights?</div>
+        <div class="options column">
+          <label class="opt-label"><input type="radio" name="q13" value="Dev engineers"> Dev engineers</label>
+          <label class="opt-label"><input type="radio" name="q13" value="Embedded QA"> Embedded QA</label>
+          <label class="opt-label"><input type="radio" name="q13" value="Enterprise QA"> Enterprise QA</label>
+          <label class="opt-label"><input type="radio" name="q13" value="Product Manager"> Product Manager</label>
+          <label class="opt-label"><input type="radio" name="q13" value="No formal validation"> No formal validation</label>
+        </div>
+      </div>
+      <div class="q-card" id="qc-14">
+        <div class="q-label"><span class="q-num">Q14</span>Do you have a documented release validation checklist or runbook?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q14" value="3"> Yes, documented and followed</label>
+          <label class="opt-label"><input type="radio" name="q14" value="2"> Informal / tribal knowledge only</label>
+          <label class="opt-label"><input type="radio" name="q14" value="0"> No</label>
+        </div>
+      </div>
+      <div class="q-card" id="qc-15">
+        <div class="q-label"><span class="q-num">Q15</span>Are any post-deploy production validation tests automated?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q15" value="3"> Yes, automated and alerting</label>
+          <label class="opt-label"><input type="radio" name="q15" value="2"> In progress</label>
+          <label class="opt-label"><input type="radio" name="q15" value="1"> Manual smoke checks only</label>
+          <label class="opt-label"><input type="radio" name="q15" value="0"> No</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 6 -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">06</span><span class="section-title">Test Planning & Documentation</span></div>
+      <div class="q-card" id="qc-16">
+        <div class="q-label"><span class="q-num">Q16</span>Do your engineers write test plans or test cases for new features?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q16" value="3"> Yes, always</label>
+          <label class="opt-label"><input type="radio" name="q16" value="2"> Yes, for major features</label>
+          <label class="opt-label"><input type="radio" name="q16" value="1"> Rarely</label>
+          <label class="opt-label"><input type="radio" name="q16" value="0"> No</label>
+        </div>
+      </div>
+      <div class="q-card" id="qc-17">
+        <div class="q-label"><span class="q-num">Q17</span>Where are test cases stored and maintained?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q17" value="Azure DevOps Test Plans"> Azure DevOps Test Plans</label>
+          <label class="opt-label"><input type="radio" name="q17" value="Spreadsheets"> Spreadsheets</label>
+          <label class="opt-label"><input type="radio" name="q17" value="Confluence/Wiki"> Confluence/Wiki</label>
+          <label class="opt-label"><input type="radio" name="q17" value="Not tracked"> Not tracked</label>
+          <label class="opt-label"><input type="radio" name="q17" value="Other"> Other</label>
+        </div>
+      </div>
+      <div class="q-card" id="qc-18">
+        <div class="q-label"><span class="q-num">Q18</span>Do you conduct 3 Amigos / requirement review sessions before dev begins?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q18" value="3"> Yes, regularly</label>
+          <label class="opt-label"><input type="radio" name="q18" value="2"> Yes, occasionally</label>
+          <label class="opt-label"><input type="radio" name="q18" value="1"> Rarely</label>
+          <label class="opt-label"><input type="radio" name="q18" value="0"> No</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 7 -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">07</span><span class="section-title">Defect Management</span></div>
+      <div class="q-card" id="qc-19">
+        <div class="q-label"><span class="q-num">Q19</span>Where does your team formally track bugs/defects?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q19" value="Azure DevOps"> Azure DevOps</label>
+          <label class="opt-label"><input type="radio" name="q19" value="Jira"> Jira</label>
+          <label class="opt-label"><input type="radio" name="q19" value="Email/Slack"> Email/Slack (informal)</label>
+          <label class="opt-label"><input type="radio" name="q19" value="Not tracked"> Not formally tracked</label>
+        </div>
+      </div>
+      <div class="q-card" id="qc-20">
+        <div class="q-label"><span class="q-num">Q20</span>Do you track escaped defects (bugs found in Prod that weren't caught in QA)?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q20" value="3"> Yes, tracked and reviewed</label>
+          <label class="opt-label"><input type="radio" name="q20" value="2"> Yes, tracked but not regularly reviewed</label>
+          <label class="opt-label"><input type="radio" name="q20" value="0"> No</label>
+        </div>
+      </div>
+      <div class="q-card" id="qc-21">
+        <div class="q-label"><span class="q-num">Q21</span>On average, how many escaped defects reach production per month?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q21" value="3"> 0</label>
+          <label class="opt-label"><input type="radio" name="q21" value="2"> 1–3</label>
+          <label class="opt-label"><input type="radio" name="q21" value="1"> 4–10</label>
+          <label class="opt-label"><input type="radio" name="q21" value="0"> 10+ or Unknown</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 8 -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">08</span><span class="section-title">Tooling & Observability</span></div>
+      <div class="q-card" id="qc-22">
+        <div class="q-label"><span class="q-num">Q22</span>Does your team have production monitoring or alerting in place?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q22" value="3"> Yes, comprehensive with alerting</label>
+          <label class="opt-label"><input type="radio" name="q22" value="2"> Partial monitoring</label>
+          <label class="opt-label"><input type="radio" name="q22" value="1"> Dashboard only — no alerting</label>
+          <label class="opt-label"><input type="radio" name="q22" value="0"> No</label>
+        </div>
+        <div class="followup" id="fu-22">
+          <div class="q-label">Which tools?</div>
+          <input type="text" class="text-input" id="q22-tools" placeholder="e.g. Datadog, New Relic, Azure Monitor, Grafana…" style="height:42px;resize:none;">
+        </div>
+      </div>
+      <div class="q-card" id="qc-23">
+        <div class="q-label"><span class="q-num">Q23</span>Do you have synthetic monitoring / synthetic user testing in production?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q23" value="3"> Yes</label>
+          <label class="opt-label"><input type="radio" name="q23" value="2"> In progress</label>
+          <label class="opt-label"><input type="radio" name="q23" value="0"> No</label>
+        </div>
+      </div>
+      <div class="q-card" id="qc-24">
+        <div class="q-label"><span class="q-num">Q24</span>What test automation tools/frameworks does your team use?</div>
+        <input type="text" class="text-input" id="q24-text" placeholder="e.g. Playwright, Selenium, Postman/Newman, Cypress…" style="height:42px;resize:none;" oninput="checkText('q24-text','qc-24')">
+      </div>
+    </div>
+
+    <!-- Section 9 -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">09</span><span class="section-title">Culture & Confidence</span></div>
+      <div class="q-card" id="qc-25">
+        <div class="q-label"><span class="q-num">Q25</span>How confident are you that your team catches critical bugs <em>before</em> they reach production?</div>
+        <div class="scale-wrap">
+          <button type="button" class="scale-btn" onclick="setScale('q25',1,this)">1</button>
+          <button type="button" class="scale-btn" onclick="setScale('q25',2,this)">2</button>
+          <button type="button" class="scale-btn" onclick="setScale('q25',3,this)">3</button>
+          <button type="button" class="scale-btn" onclick="setScale('q25',4,this)">4</button>
+          <button type="button" class="scale-btn" onclick="setScale('q25',5,this)">5</button>
+        </div>
+        <div class="scale-labels"><span>Not at all</span><span>Very confident</span></div>
+        <input type="hidden" id="q25-val" value="">
+      </div>
+      <div class="q-card" id="qc-26">
+        <div class="q-label"><span class="q-num">Q26</span>Does your team conduct post-incident reviews (PIRs) after production issues?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q26" value="3"> Yes, consistently with action items tracked</label>
+          <label class="opt-label"><input type="radio" name="q26" value="2"> Sometimes</label>
+          <label class="opt-label"><input type="radio" name="q26" value="1"> Rarely</label>
+          <label class="opt-label"><input type="radio" name="q26" value="0"> No</label>
+        </div>
+      </div>
+      <div class="q-card" id="qc-27">
+        <div class="q-label"><span class="q-num">Q27</span>Are quality metrics reviewed regularly with your team?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q27" value="3"> Yes, in sprint reviews or regular cadence</label>
+          <label class="opt-label"><input type="radio" name="q27" value="2"> Occasionally</label>
+          <label class="opt-label"><input type="radio" name="q27" value="0"> No</label>
+        </div>
+      </div>
+      <div class="q-card" id="qc-28">
+        <div class="q-label"><span class="q-num">Q28</span>Do engineers take ownership of quality, or is it seen as "QA's job"?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="q28" value="3"> Strong ownership — quality is everyone's responsibility</label>
+          <label class="opt-label"><input type="radio" name="q28" value="2"> Mixed — some engineers care, some don't</label>
+          <label class="opt-label"><input type="radio" name="q28" value="1"> Mostly deferred to QA</label>
+          <label class="opt-label"><input type="radio" name="q28" value="0"> Fully deferred — QA's job only</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 10 -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">10</span><span class="section-title">Open Feedback</span></div>
+      <div class="q-card" id="qc-29">
+        <div class="q-label"><span class="q-num">Q29</span>What is the single biggest quality challenge your team faces today?</div>
+        <textarea class="text-input" id="q29-text" placeholder="Be as specific as possible…" oninput="checkText('q29-text','qc-29')"></textarea>
+      </div>
+      <div class="q-card" id="qc-30">
+        <div class="q-label"><span class="q-num">Q30</span>What would most help your team improve quality in the next 6 months?</div>
+        <textarea class="text-input" id="q30-text" placeholder="Tools, training, headcount, process changes…" oninput="checkText('q30-text','qc-30')"></textarea>
+      </div>
+    </div>
+
+    <div class="submit-area">
+      <button type="button" class="submit-btn" id="submitBtn" onclick="submitSurvey()">Submit & View My Score →</button>
+      <div class="sending-msg" id="sendingMsg">⏳ Submitting your response…</div>
+      <div class="submitted-badge" id="submittedBadge">✅ Response submitted to Google Sheets. Thank you!</div>
+    </div>
+
+  </form>
+</div>
+
+<!-- Results Overlay -->
+<div class="results-overlay" id="resultsOverlay">
+  <div class="results-card">
+    <div class="eyebrow" style="text-align:center;margin-bottom:12px;">Quality Assessment Results</div>
+    <div class="results-score-big" id="resultsScore">0</div>
+    <div class="results-tier-badge" id="resultsTierBadge"></div>
+    <h3 style="font-family:'DM Serif Display',serif;font-size:18px;margin-bottom:14px;">Score by Domain</h3>
+    <div class="results-breakdown" id="resultsBreakdown"></div>
+    <div class="results-recs" style="margin-bottom:24px;">
+      <h3>Priority Recommendations</h3>
+      <div id="resultsRecs"></div>
+    </div>
+    <button class="close-results-btn" onclick="document.getElementById('resultsOverlay').classList.remove('active')">← Back to Survey</button>
+  </div>
+</div>
+
+<script>
+// ── Setup banner ─────────────────────────────────────────────────────────────
+const STORAGE_KEY = "soq_script_url";
+
+(function initBanner() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    document.getElementById("setupBanner").style.display = "none";
+    document.getElementById("scriptUrlInput").value = saved;
+  }
+})();
+
+function saveScriptUrl() {
+  const url = document.getElementById("scriptUrlInput").value.trim();
+  if (!url.startsWith("https://script.google.com")) {
+    alert("That doesn't look like a Google Apps Script URL. It should start with https://script.google.com/macros/s/...");
+    return;
+  }
+  localStorage.setItem(STORAGE_KEY, url);
+  document.getElementById("setupBanner").style.display = "none";
+}
+
+function getScriptUrl() {
+  return localStorage.getItem(STORAGE_KEY) || "";
+}
+
+// ── Scoring config ────────────────────────────────────────────────────────────
+const scoring = {
+  q1:{max:3,field:'unit'}, q2:{max:3,field:'unit'},
+  q4:{max:3,field:'integration'}, q5:{max:3,field:'integration'},
+  q6:{max:3,field:'e2e'}, q8:{max:3,field:'e2e'},
+  q9:{max:3,field:'cicd'}, q10:{max:3,field:'cicd'}, q11:{max:3,field:'cicd'},
+  q14:{max:3,field:'release'}, q15:{max:3,field:'release'},
+  q16:{max:3,field:'planning'}, q18:{max:3,field:'planning'},
+  q20:{max:3,field:'defects'}, q21:{max:3,field:'defects'},
+  q22:{max:3,field:'tooling'}, q23:{max:3,field:'tooling'},
+  q25:{max:5,field:'culture'}, q26:{max:3,field:'culture'},
+  q27:{max:3,field:'culture'}, q28:{max:3,field:'culture'},
+};
+const domainMax   = {unit:6,integration:6,e2e:6,cicd:9,release:6,planning:6,defects:6,tooling:6,culture:14};
+const domainLabel = {unit:'Unit Testing',integration:'Integration Testing',e2e:'E2E/Functional',cicd:'CI/CD Pipeline',release:'Release Validation',planning:'Test Planning',defects:'Defect Management',tooling:'Tooling/Observability',culture:'Quality Culture'};
+const scaleAnswers = {};
+
+// ── Event wiring ─────────────────────────────────────────────────────────────
+document.querySelectorAll('input[type=radio]').forEach(r => {
+  r.addEventListener('change', () => {
+    updateCard(r.name);
+    handleConditional(r.name, r.value);
+    recalcScore();
+    updateProgress();
+  });
+});
+document.querySelectorAll('input[type=checkbox]').forEach(c => {
+  c.addEventListener('change', () => {
+    c.closest('.opt-label').classList.toggle('selected', c.checked);
+  });
+});
+
+function updateCard(name) {
+  document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+    r.closest('.opt-label')?.classList.toggle('selected', r.checked);
+  });
+  const num = name.replace('q','');
+  document.getElementById('qc-' + num)?.classList.add('answered');
+}
+
+function handleConditional(name, val) {
+  const map = {q1:'fu-1', q4:'fu-4', q9:'fu-9', q22:'fu-22'};
+  if (map[name]) document.getElementById(map[name]).classList.toggle('visible', val !== '0');
+}
+
+function setScale(qid, val, btn) {
+  scaleAnswers[qid] = val;
+  btn.closest('.q-card').classList.add('answered');
+  btn.closest('.scale-wrap').querySelectorAll('.scale-btn').forEach(b => {
+    b.classList.toggle('selected', parseInt(b.textContent) <= val);
+  });
+  document.getElementById(qid + '-val').value = val;
+  recalcScore();
+  updateProgress();
+}
+
+function checkText(inputId, cardId) {
+  const val = document.getElementById(inputId).value.trim();
+  document.getElementById(cardId)?.classList.toggle('answered', val.length > 0);
+  updateProgress();
+}
+
+function getRadio(name) {
+  const c = document.querySelector(`input[name="${name}"]:checked`);
+  return c ? c.value : null;
+}
+
+function getCheckboxes(name) {
+  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(c => c.value).join(', ');
+}
+
+function recalcScore() {
+  const domainScores = {};
+  Object.keys(domainMax).forEach(d => domainScores[d] = 0);
+  let total = 0, maxTotal = 0;
+  for (const [qid, cfg] of Object.entries(scoring)) {
+    maxTotal += cfg.max;
+    let val = qid === 'q25' ? (scaleAnswers['q25'] || 0) : (parseFloat(getRadio(qid)) || 0);
+    const pts = Math.min(val, cfg.max);
+    total += pts;
+    domainScores[cfg.field] += pts;
+  }
+  const norm = Math.round((total / maxTotal) * 100);
+  document.getElementById('liveScore').textContent = norm;
+  const tier = getTier(norm);
+  const tierEl = document.getElementById('liveTier');
+  tierEl.textContent = tier.label;
+  tierEl.className = 'score-tier ' + tier.cls;
+  window._lastScore = {norm, domainScores, raw: total};
+  return {norm, domainScores, raw: total};
+}
+
+function getTier(s) {
+  if (s >= 80) return {label:'🟢 Optimizing', cls:'tier-4'};
+  if (s >= 60) return {label:'🔵 Maturing',   cls:'tier-3'};
+  if (s >= 35) return {label:'🟡 Developing',  cls:'tier-2'};
+  return              {label:'🔴 Initial',     cls:'tier-1'};
+}
+
+function updateProgress() {
+  const count = document.querySelectorAll('.q-card.answered').length;
+  const total = document.querySelectorAll('.q-card[id^="qc-"]').length;
+  const pct = Math.round((count / total) * 100);
+  document.getElementById('progressLabel').textContent = `${count} of ${total} questions answered`;
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+// ── Build payload ─────────────────────────────────────────────────────────────
+function buildPayload(score) {
+  return {
+    manager:    document.getElementById('q-mgr').value.trim(),
+    date:       document.getElementById('q-date').value,
+    q1:         getRadio('q1'),
+    q1_cov:     document.getElementById('q1-cov').value,
+    q1_actual:  document.getElementById('q1-actual').value,
+    q2:         getRadio('q2'),
+    q3:         document.getElementById('q3-text').value.trim(),
+    q4:         getRadio('q4'),
+    q4_layers:  getCheckboxes('q4-layers'),
+    q5:         getRadio('q5'),
+    q6:         getRadio('q6'),
+    q7:         getRadio('q7'),
+    q8:         getRadio('q8'),
+    q9:         getRadio('q9'),
+    q9_env:     getCheckboxes('q9-env'),
+    q10:        getRadio('q10'),
+    q11:        getRadio('q11'),
+    q12:        getRadio('q12'),
+    q13:        getRadio('q13'),
+    q14:        getRadio('q14'),
+    q15:        getRadio('q15'),
+    q16:        getRadio('q16'),
+    q17:        getRadio('q17'),
+    q18:        getRadio('q18'),
+    q19:        getRadio('q19'),
+    q20:        getRadio('q20'),
+    q21:        getRadio('q21'),
+    q22:        getRadio('q22'),
+    q22_tools:  document.getElementById('q22-tools').value.trim(),
+    q23:        getRadio('q23'),
+    q24:        document.getElementById('q24-text').value.trim(),
+    q25:        scaleAnswers['q25'] || '',
+    q26:        getRadio('q26'),
+    q27:        getRadio('q27'),
+    q28:        getRadio('q28'),
+    q29:        document.getElementById('q29-text').value.trim(),
+    q30:        document.getElementById('q30-text').value.trim(),
+    raw_score:  score.raw,
+    score_100:  score.norm,
+    tier:       getTier(score.norm).label,
+  };
+}
+
+// ── Submit ────────────────────────────────────────────────────────────────────
+async function submitSurvey() {
+  const score = recalcScore();
+  showResults(score);   // Show results immediately — don't make them wait
+
+  const url = getScriptUrl();
+  const btn = document.getElementById('submitBtn');
+  const sendingMsg = document.getElementById('sendingMsg');
+  const submittedBadge = document.getElementById('submittedBadge');
+
+  btn.disabled = true;
+  sendingMsg.style.display = 'block';
+
+  if (!url) {
+    sendingMsg.style.display = 'none';
+    submittedBadge.textContent = "⚠ No Google Sheets URL configured — results shown locally only. See setup banner.";
+    submittedBadge.classList.add('visible');
+    return;
+  }
+
+  try {
+    const payload = buildPayload(score);
+    // Use no-cors mode since Apps Script doesn't return CORS headers on redirect
+    await fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    sendingMsg.style.display = 'none';
+    submittedBadge.textContent = "✅ Response submitted to Google Sheets. Thank you!";
+    submittedBadge.classList.add('visible');
+  } catch (err) {
+    sendingMsg.style.display = 'none';
+    submittedBadge.textContent = "⚠ Submission failed — check your URL or network. Your score is shown below.";
+    submittedBadge.classList.add('visible');
+    console.error(err);
+  }
+}
+
+function showResults(score) {
+  document.getElementById('resultsScore').textContent = score.norm;
+  const tier = getTier(score.norm);
+  document.getElementById('resultsTierBadge').innerHTML = `
+    <span class="score-tier ${tier.cls}" style="font-size:14px;padding:6px 18px;">${tier.label}</span>
+    <div style="margin-top:10px;font-size:13px;color:var(--muted);">${getTierDesc(tier.label)}</div>`;
+
+  const breakdown = document.getElementById('resultsBreakdown');
+  breakdown.innerHTML = '';
+  Object.entries(score.domainScores).forEach(([domain, pts]) => {
+    const pct = Math.round((pts / domainMax[domain]) * 100);
+    breakdown.innerHTML += `<div class="breakdown-row">
+      <span>${domainLabel[domain]}</span>
+      <div class="breakdown-bar-wrap"><div class="breakdown-bar" style="width:${pct}%"></div></div>
+      <span class="breakdown-pts">${pts}/${domainMax[domain]}</span>
+    </div>`;
+  });
+
+  const recs = {
+    unit:"Establish unit testing standards and a coverage target (suggest 70%+). Build this habit via a quality boot camp.",
+    integration:"Define integration test coverage for service boundaries. Start with API contract and database layers.",
+    e2e:"Identify your top 10–20 critical user journeys and automate them. Assign ownership to a QE team member.",
+    cicd:"Add automated tests as a pipeline gate on PR merge and deploy to QA. Start with smoke tests if nothing exists.",
+    release:"Formalize Thursday night release validation with a documented runbook. Automate post-deploy smoke checks.",
+    planning:"Add test plan requirements to your Definition of Done. Pilot 3 Amigos sessions for the next sprint.",
+    defects:"Start tracking escaped defects in Azure DevOps. Set a monthly review cadence to identify patterns.",
+    tooling:"Evaluate Datadog or Azure Monitor for alerting. Synthetic monitoring should be a near-term priority.",
+    culture:"Build quality ownership through code review expectations and pair-testing sessions with QE."
+  };
+  const sorted = Object.entries(score.domainScores).sort((a,b) => (a[1]/domainMax[a[0]]) - (b[1]/domainMax[b[0]]));
+  document.getElementById('resultsRecs').innerHTML = sorted.slice(0,3).map(([d]) => `<div class="rec-item">${recs[d]}</div>`).join('');
+
+  document.getElementById('resultsOverlay').classList.add('active');
+}
+
+function getTierDesc(tier) {
+  return {
+    '🔴 Initial':    'Testing practices are largely informal or absent. Immediate action needed on unit testing, CI gating, and defect tracking.',
+    '🟡 Developing': 'Some practices in place but inconsistently applied. Focus on standardizing and closing the biggest gaps.',
+    '🔵 Maturing':   'Solid foundation with good coverage in several areas. Shift energy toward automation and shift-left practices.',
+    '🟢 Optimizing': 'Strong quality discipline across the board. Focus on continuous improvement and sharing learnings with other teams.'
+  }[tier] || '';
+}
+</script>
+</body>
+</html>
