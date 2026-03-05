@@ -422,15 +422,80 @@
       </div>
     </div>
 
-    <!-- SECTION 09 — Open Feedback -->
+    <!-- SECTION 09 — Enterprise QA Support -->
     <div class="section">
-      <div class="section-header"><span class="section-num">09</span><span class="section-title">Open Feedback</span></div>
+      <div class="section-header"><span class="section-num">09</span><span class="section-title">Enterprise QA Support</span></div>
+
+      <div class="q-card" id="qc-qa1">
+        <div class="q-label"><span class="q-num">Q26</span>Do you feel your team has sufficient support from the Enterprise QA team?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="qa1" value="Yes, fully supported"> Yes, fully supported</label>
+          <label class="opt-label"><input type="radio" name="qa1" value="Somewhat — could use more"> Somewhat — could use more</label>
+          <label class="opt-label"><input type="radio" name="qa1" value="No, not enough support"> No, not enough support</label>
+          <label class="opt-label"><input type="radio" name="qa1" value="No QA support at all"> No QA support at all</label>
+        </div>
+      </div>
+
+      <div class="q-card" id="qc-qa2">
+        <div class="q-label"><span class="q-num">Q27</span>Is QA currently a bottleneck in your delivery pipeline?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="qa2" value="No, not a bottleneck"> No, not a bottleneck</label>
+          <label class="opt-label"><input type="radio" name="qa2" value="Occasionally"> Occasionally</label>
+          <label class="opt-label"><input type="radio" name="qa2" value="Yes, frequently"> Yes, frequently</label>
+          <label class="opt-label"><input type="radio" name="qa2" value="Yes, a significant blocker"> Yes, a significant blocker</label>
+        </div>
+      </div>
+
+      <div class="q-card" id="qc-qa3">
+        <div class="q-label"><span class="q-num">Q28</span>How well do you feel the QA team understands your product and domain?</div>
+        <div class="options">
+          <label class="opt-label"><input type="radio" name="qa3" value="Very well"> Very well</label>
+          <label class="opt-label"><input type="radio" name="qa3" value="Somewhat"> Somewhat</label>
+          <label class="opt-label"><input type="radio" name="qa3" value="Not very well"> Not very well</label>
+          <label class="opt-label"><input type="radio" name="qa3" value="No QA assigned to my team"> No QA assigned to my team</label>
+        </div>
+      </div>
+
+      <div class="q-card" id="qc-qa4">
+        <div class="q-label"><span class="q-num">Q29</span>How early does QA get involved in your development process?</div>
+        <div class="options column">
+          <label class="opt-label"><input type="radio" name="qa4" value="Requirements / planning phase"> Requirements / planning phase</label>
+          <label class="opt-label"><input type="radio" name="qa4" value="During development / sprint"> During development / sprint</label>
+          <label class="opt-label"><input type="radio" name="qa4" value="After dev is complete (pre-release)"> After dev is complete (pre-release)</label>
+          <label class="opt-label"><input type="radio" name="qa4" value="Only at release time"> Only at release time</label>
+          <label class="opt-label"><input type="radio" name="qa4" value="QA is not involved"> QA is not involved</label>
+        </div>
+      </div>
+
+      <div class="q-card" id="qc-qa5">
+        <div class="q-label"><span class="q-num">Q30</span>How satisfied are you with the overall quality of QA testing performed on your team's deliverables?</div>
+        <div class="scale-wrap">
+          <button type="button" class="scale-btn" onclick="setScale('qa5',1,this)">1</button>
+          <button type="button" class="scale-btn" onclick="setScale('qa5',2,this)">2</button>
+          <button type="button" class="scale-btn" onclick="setScale('qa5',3,this)">3</button>
+          <button type="button" class="scale-btn" onclick="setScale('qa5',4,this)">4</button>
+          <button type="button" class="scale-btn" onclick="setScale('qa5',5,this)">5</button>
+        </div>
+        <div class="scale-labels"><span>Very dissatisfied</span><span>Very satisfied</span></div>
+        <input type="hidden" id="qa5-val" value="">
+      </div>
+
+      <div class="q-card" id="qc-qa6">
+        <div class="q-label"><span class="q-num">Q31</span>What is the biggest gap in QA support your team experiences today?</div>
+        <textarea class="text-input" id="qa6-text" placeholder="e.g. Not enough automation, slow turnaround, lack of domain knowledge, no coverage on our stack…" oninput="checkText('qa6-text','qc-qa6')"></textarea>
+      </div>
+
+    </div>
+
+    <!-- SECTION 10 — Open Feedback -->
+    <div class="section">
+      <div class="section-header"><span class="section-num">10</span><span class="section-title">Open Feedback</span></div>
       <div class="q-card" id="qc-29">
-        <div class="q-label"><span class="q-num">Q26</span>What is the single biggest quality challenge your team faces today?</div>
+        <div class="q-label"><span class="q-num">Q32</span>What is the single biggest quality challenge your team faces today?</div>
         <textarea class="text-input" id="q29-text" placeholder="Be as specific as possible…" oninput="checkText('q29-text','qc-29')"></textarea>
       </div>
       <div class="q-card" id="qc-30">
-        <div class="q-label"><span class="q-num">Q27</span>What would most help your team improve quality in the next 6 months?</div>
+        <div class="q-label"><span class="q-num">Q33</span>What would most help your team improve quality in the next 6 months?</div>
         <textarea class="text-input" id="q30-text" placeholder="Tools, training, headcount, process changes…" oninput="checkText('q30-text','qc-30')"></textarea>
       </div>
     </div>
@@ -621,6 +686,13 @@ function buildPayload(score) {
     q28:       getRadio('q28'),
     q29:       document.getElementById('q29-text').value.trim(),
     q30:       document.getElementById('q30-text').value.trim(),
+    // QA Support section
+    qa1:       getRadio('qa1'),
+    qa2:       getRadio('qa2'),
+    qa3:       getRadio('qa3'),
+    qa4:       getRadio('qa4'),
+    qa5:       scaleAnswers['qa5'] || '',
+    qa6:       document.getElementById('qa6-text').value.trim(),
     raw_score: score.raw,
     score_100: score.norm,
     tier:      getTier(score.norm).label,
